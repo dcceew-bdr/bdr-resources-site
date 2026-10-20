@@ -37,14 +37,15 @@ jobs:
         id: image
         env:
           REGISTRY: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+          REGISTRY_GROUP: ${{ vars.AZURE_CONTAINER_REGISTRY_RESOURCE_GROUP }}
         run: |
           set -euo pipefail
-          server="$(az acr show --name "$REGISTRY" --query loginServer --output tsv)"
+          server="$(az acr show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --query loginServer --output tsv)"
           image="$server/resources-bdr-prez:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          az acr login --name "$REGISTRY"
+          az acr login --name "$REGISTRY" --resource-group "$REGISTRY_GROUP"
           docker build --platform linux/amd64 --tag "$image" .
           docker push "$image"
-          digest="$(az acr repository show --name "$REGISTRY" --image "${image#*/}" --query digest --output tsv)"
+          digest="$(az acr repository show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --image "${image#*/}" --query digest --output tsv)"
           echo "reference=$server/resources-bdr-prez@$digest" >> "$GITHUB_OUTPUT"
 
       - name: Deploy Prez to Azure Container Apps

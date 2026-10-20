@@ -138,7 +138,7 @@ The Container App, Consumption environment, subnet, logs, runtime settings and K
 `resources.bdr.gov.au-infra`. The root Dockerfile includes Prez, repository-owned middleware and `prez/config/`.
 
 The deployment workflow uses the existing GitHub OIDC identity. Terraform grants it Container Apps Contributor on Prez
-and AcrPush on the existing registry. Configure these GitHub Actions `dev` environment variables:
+and AcrPush plus Reader on the existing registry. Configure these GitHub Actions `dev` environment variables:
 
 ```text
 AZURE_CLIENT_ID
@@ -146,6 +146,7 @@ AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
 AZURE_CONTAINER_APP_NAME=resources-bdr-dev-prez
 AZURE_CONTAINER_REGISTRY_NAME=crbdrdev001
+AZURE_CONTAINER_REGISTRY_RESOURCE_GROUP=container-rg
 AZURE_RESOURCE_GROUP=resources-bdr-gov-au-rg
 ```
 
