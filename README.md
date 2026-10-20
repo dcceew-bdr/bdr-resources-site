@@ -8,7 +8,7 @@ deployed for the [Biodiversity Data repository](https://bdr.gov.au)'s reference 
 The tool used here is [Prez](https://prez.dev/), which is a Linked Data API and UI that makes RDF data available on the
 web for humans and machines.
 
-The Prez API is deployed to the Azure Cloud using a Functions app and the UI is an Azure container app. The database 
+The Prez API runs in Azure Container Apps and PrezUI runs in Azure Static Web Apps. The database
 containing the RDF data is a [Fuseki](https://jena.apache.org/documentation/fuseki2/) instance within the BDR's cloud
 tenancy.
 
@@ -124,7 +124,7 @@ task functions:down
 
 The development deployment uses two independent Azure application resources:
 
-- Prez runs in a Python 3.12 Azure Function App on the Flex Consumption plan.
+- Prez runs directly through Uvicorn in Azure Container Apps.
 - PrezUI is generated as a client-side Nuxt site and deployed to Azure Static Web Apps.
 
 Fuseki runs separately on the VM managed by `resources.bdr.gov.au-infra`.
@@ -132,52 +132,31 @@ Fuseki runs separately on the VM managed by `resources.bdr.gov.au-infra`.
 The workflows under `.github/workflows/` deploy both applications when relevant
 files change on `main`. Apply `resources.bdr.gov.au-infra` before enabling them.
 
-### Function App
+### Container App
 
-The Linux Flex Consumption Function App, storage account, Application Insights,
-settings, and Key Vault reference are managed by `resources.bdr.gov.au-infra`.
-The effective application settings include:
+The Container App, Consumption environment, subnet, logs, runtime settings and Key Vault secret reference are managed by
+`resources.bdr.gov.au-infra`. The root Dockerfile includes Prez, repository-owned middleware and `prez/config/`.
 
-```text
-AzureWebJobsFeatureFlags=EnableWorkerIndexing
-SPARQL_REPO_TYPE=remote
-SPARQL_ENDPOINT=https://fuseki.resources.dev.bdr.gov.au/refdata/sparql
-SPARQL_USERNAME=refdata
-SPARQL_PASSWORD=<secret>
-ENABLE_SPARQL_ENDPOINT=true
-FUNCTION_APP_AUTH_LEVEL=ANONYMOUS
-FUNCTION_APP_ROOT_PATH=
-CORS_ALLOWED_ORIGIN=https://resources.dev.bdr.gov.au
-```
-
-Do not add `FUNCTIONS_WORKER_RUNTIME` to the deployed Function App. Flex
-Consumption configures Python 3.12 through the Function runtime properties and
-rejects that legacy app setting. It remains in `prez/local.settings.example.json`
-because Azure Functions Core Tools requires it for local development.
-
-The Function must be anonymous because a Function key cannot safely be embedded
-in the static browser application. Store the SPARQL password in Azure application
-settings or use a Key Vault reference. Do not publish `local.settings.json`.
-
-The deployment workflow uses GitHub OIDC. Configure a federated Azure identity
-for this repository and grant it permission to deploy to the Function App. Add
-these non-secret GitHub Actions repository or `dev` environment variables:
+The deployment workflow uses the existing GitHub OIDC identity. Terraform grants it Container Apps Contributor on Prez
+and AcrPush on the existing registry. Configure these GitHub Actions `dev` environment variables:
 
 ```text
 AZURE_CLIENT_ID
 AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
+AZURE_CONTAINER_APP_NAME=resources-bdr-dev-prez
+AZURE_CONTAINER_REGISTRY_NAME=crbdrdev001
+AZURE_RESOURCE_GROUP=resources-bdr-gov-au-rg
 ```
 
-Also add this GitHub Actions repository or `dev` environment variable:
+`.github/workflows/deploy-prez.yml` builds the root Dockerfile for Linux AMD64, publishes a unique image tag and deploys
+its immutable digest. Terraform owns runtime configuration and ignores later image releases. The app exposes port 8000
+through HTTPS ingress with one minimum replica and startup/readiness probes at `/health`.
 
-```text
-AZURE_FUNCTION_APP_NAME=resources-bdr-dev-prez-0zlag
-```
-
-The workflow in `.github/workflows/deploy-prez.yml` exports the locked `uv`
-environment to `requirements.txt` and asks Azure to perform the Flex Consumption
-remote build. The generated file remains ignored locally.
+The SPARQL endpoint remains `https://fuseki.resources.dev.bdr.gov.au/refdata/sparql`, with username `refdata` and the
+password resolved from Key Vault by a managed identity. `CORS_ALLOWED_ORIGIN` is `https://resources.dev.bdr.gov.au`.
+Proxy headers are enabled so generated API links use HTTPS. Functions-specific runtime settings are no longer used
+for Azure deployment; the Functions emulator remains available for local development.
 
 ### Static Web App
 
@@ -189,37 +168,29 @@ or `dev` environment secret:
 AZURE_STATIC_WEB_APPS_API_TOKEN=<deployment token>
 ```
 
-Add the public Function endpoint as a GitHub Actions repository or `dev`
-environment variable. It has no `/api` suffix because `prez/host.json` sets an
-empty Functions route prefix:
-
-```text
-PREZ_API_ENDPOINT=https://resources-bdr-dev-prez-0zlag.azurewebsites.net
-```
+Set `PREZ_API_ENDPOINT` in the GitHub Actions `dev` environment to the `prez_api_endpoint` Terraform output, without
+an `/api` suffix. Rebuild and deploy PrezUI whenever that hostname changes.
 
 The workflow in `.github/workflows/deploy-prez-ui.yml` builds the existing
 PrezUI Dockerfile with this endpoint, extracts the generated static files, and
 deploys them to Static Web Apps. This deliberately reuses the same Docker build
 as local testing. `prez-ui/overrides/public/staticwebapp.config.json` provides
-the fallback needed when browser routes such as `/catalogs` are opened directly.
+the fallback needed when browser routes such as `/catalogues` are opened directly.
 
-After Azure assigns the Static Web App hostname, set `CORS_ALLOWED_ORIGIN` on the
-Function App to that exact origin. If a custom UI domain is added later, update
-both that setting and any configured Azure platform CORS rules. Do not configure
-both the application middleware and Azure platform CORS to emit duplicate CORS
-headers.
+Keep `CORS_ALLOWED_ORIGIN` aligned with the UI custom domain. The application middleware emits CORS headers; avoid
+adding duplicate headers through platform CORS settings.
 
 ### Deployment checks
 
 After the first deployment, verify:
 
 ```text
-https://<Function App resource name>.azurewebsites.net/health
-https://<Function App resource name>.azurewebsites.net/catalogs
-https://<Static Web App hostname>/catalogs
+https://<Container App FQDN>/health
+https://<Container App FQDN>/catalogues
+https://<Static Web App hostname>/catalogues
 ```
 
-Browser network requests from PrezUI should go directly to the Function hostname,
+Browser network requests from PrezUI should go directly to the Container App hostname,
 must not contain `localhost` or `/api`, and must return exactly one matching
 `Access-Control-Allow-Origin` header.
 

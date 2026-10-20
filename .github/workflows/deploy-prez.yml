@@ -1,9 +1,10 @@
-name: Deploy Prez Function App
+name: Deploy Prez Container App
 
 on:
   push:
     branches: [main]
     paths:
+      - "Dockerfile"
       - "prez/**"
       - ".github/workflows/deploy-prez.yml"
   workflow_dispatch:
@@ -25,18 +26,6 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: true
-          cache-dependency-glob: prez/uv.lock
-
-      - name: Export locked production dependencies
-        # Azure's remote pip build cannot verify hashes for Git dependencies.
-        # Prez itself pins rdf2geojson with its oxigraph extra; omit uv's second
-        # direct-URL form so pip does not treat tag and commit URLs as a conflict.
-        run: uv export --project prez --locked --no-dev --no-hashes --no-emit-package rdf2geojson --output-file prez/requirements.txt
-
       - name: Log in to Azure with GitHub OIDC
         uses: azure/login@v3
         with:
@@ -44,10 +33,32 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy Prez to Azure Functions
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ vars.AZURE_FUNCTION_APP_NAME }}
-          package: prez
-          remote-build: true
-          respect-funcignore: true
+      - name: Build and publish Prez
+        id: image
+        env:
+          REGISTRY: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+        run: |
+          set -euo pipefail
+          server="$(az acr show --name "$REGISTRY" --query loginServer --output tsv)"
+          image="$server/resources-bdr-prez:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          az acr login --name "$REGISTRY"
+          docker build --platform linux/amd64 --tag "$image" .
+          docker push "$image"
+          digest="$(az acr repository show --name "$REGISTRY" --image "${image#*/}" --query digest --output tsv)"
+          echo "reference=$server/resources-bdr-prez@$digest" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy Prez to Azure Container Apps
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          APP_NAME: ${{ vars.AZURE_CONTAINER_APP_NAME }}
+          IMAGE: ${{ steps.image.outputs.reference }}
+        run: |
+          set -euo pipefail
+          az containerapp update \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$APP_NAME" \
+            --container-name prez \
+            --image "$IMAGE" \
+            --output none
+          host="$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$APP_NAME" --query properties.configuration.ingress.fqdn --output tsv)"
+          curl --fail --retry 18 --retry-delay 10 --retry-all-errors "https://$host/health"
