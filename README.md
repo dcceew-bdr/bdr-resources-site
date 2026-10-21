@@ -127,7 +127,7 @@ The development deployment uses two independent Azure application resources:
 - Prez runs directly through Uvicorn in Azure Container Apps.
 - PrezUI is generated as a client-side Nuxt site and deployed to Azure Static Web Apps.
 
-Fuseki runs separately on the VM managed by `resources.bdr.gov.au-infra`.
+Fuseki runs separately on the VM managed by [`bdr-main-terraform`](https://dev.azure.com/bdr-devops-org/bdr-project/_git/bdr-main-terraform).
 
 The workflows under `.github/workflows/` deploy both applications when relevant
 files change on `main`. Apply `resources.bdr.gov.au-infra` before enabling them.
@@ -135,19 +135,24 @@ files change on `main`. Apply `resources.bdr.gov.au-infra` before enabling them.
 ### Container App
 
 The Container App, Consumption environment, subnet, logs, runtime settings and Key Vault secret reference are managed by
-`resources.bdr.gov.au-infra`. The root Dockerfile includes Prez, repository-owned middleware and `prez/config/`.
+[`bdr-main-terraform`](https://dev.azure.com/bdr-devops-org/bdr-project/_git/bdr-main-terraform). 
 
-The deployment workflow uses the existing GitHub OIDC identity. Terraform grants it Container Apps Contributor on Prez
-and AcrPush plus Reader on the existing registry. Configure these GitHub Actions `dev` environment variables:
+The root Dockerfile includes Prez, repository-owned middleware and `prez/config/`.
+
+The deployment workflow uses the existing GitHub OIDC identity. Terraform grants Prez and AcrPush plus Reader on the existing registry. 
+
+Once the images is pushed to the Conntainer Registry, image name neeeds to be updated in Terrafrom
+
+Configure these GitHub Actions `dev` environment variables:
 
 ```text
 AZURE_CLIENT_ID
 AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
-AZURE_CONTAINER_APP_NAME=resources-bdr-dev-prez
+AZURE_CONTAINER_APP_NAME=ca-bdr-prez-vocab-dev-010
 AZURE_CONTAINER_REGISTRY_NAME=crbdrdev001
-AZURE_CONTAINER_REGISTRY_RESOURCE_GROUP=container-rg
-AZURE_RESOURCE_GROUP=resources-bdr-gov-au-rg
+AZURE_CONTAINER_RESOURCE_GROUP=container-rg
+AZURE_STATIC_WEB_APPS_API_TOKEN
 ```
 
 `.github/workflows/deploy-prez.yml` builds the root Dockerfile for Linux AMD64, publishes a unique image tag and deploys

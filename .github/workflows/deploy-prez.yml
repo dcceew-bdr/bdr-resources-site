@@ -47,19 +47,3 @@ jobs:
           docker push "$image"
           digest="$(az acr repository show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --image "${image#*/}" --query digest --output tsv)"
           echo "reference="$image"" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy Prez to Azure Container Apps
-        env:
-          RESOURCE_GROUP: ${{ vars.AZURE_CONTAINER_RESOURCE_GROUP }}
-          APP_NAME: ${{ vars.AZURE_CONTAINER_APP_NAME }}
-          IMAGE: ${{ steps.image.outputs.reference }}
-        run: |
-          set -euo pipefail
-          az containerapp update \
-            --resource-group "$RESOURCE_GROUP" \
-            --name "$APP_NAME" \
-            --container-name prez \
-            --image "$IMAGE" \
-            --output none
-          host="$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$APP_NAME" --query properties.configuration.ingress.fqdn --output tsv)"
-          curl --fail --retry 18 --retry-delay 10 --retry-all-errors "https://$host/health"
