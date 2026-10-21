@@ -37,7 +37,7 @@ jobs:
         id: image
         env:
           REGISTRY: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
-          REGISTRY_GROUP: ${{ vars.AZURE_CONTAINER_REGISTRY_RESOURCE_GROUP }}
+          REGISTRY_GROUP: ${{ vars.AZURE_CONTAINER_RESOURCE_GROUP }}
         run: |
           set -euo pipefail
           server="$(az acr show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --query loginServer --output tsv)"
@@ -50,7 +50,7 @@ jobs:
 
       - name: Deploy Prez to Azure Container Apps
         env:
-          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          RESOURCE_GROUP: ${{ vars.AZURE_CONTAINER_RESOURCE_GROUP }}
           APP_NAME: ${{ vars.AZURE_CONTAINER_APP_NAME }}
           IMAGE: ${{ steps.image.outputs.reference }}
         run: |
