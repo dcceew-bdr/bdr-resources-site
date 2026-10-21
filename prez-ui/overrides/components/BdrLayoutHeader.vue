@@ -12,7 +12,7 @@
                     <h2>&nbsp;</h2>
                 </div>
                 <div class="column is-one-fifth bdr-logo">
-                    <a href="https://www.dcceew.gov.au/environment/science-research/aera" target="_blank" rel="noopener noreferrer">
+                    <a href="https://bdr.gov.au" target="_blank" rel="noopener noreferrer">
                         <img src="/BDR-logo.png" alt="BDR logo">
                     </a>
                 </div>
