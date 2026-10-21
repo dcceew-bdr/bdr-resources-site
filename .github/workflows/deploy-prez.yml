@@ -46,7 +46,7 @@ jobs:
           docker build --platform linux/amd64 --tag "$image" .
           docker push "$image"
           digest="$(az acr repository show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --image "${image#*/}" --query digest --output tsv)"
-          echo "reference="${image#*/}"" >> "$GITHUB_OUTPUT"
+          echo "reference="$image"" >> "$GITHUB_OUTPUT"
 
       - name: Deploy Prez to Azure Container Apps
         env:
