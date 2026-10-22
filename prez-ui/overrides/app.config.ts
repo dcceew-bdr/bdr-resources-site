@@ -6,7 +6,7 @@ export default defineAppConfig({
     ],
 
     secondaryMenu: () => [
-        { "label": "Catalogues", "url": "/catalogues-home", "active": true },
+        { "label": "Catalogues", "url": "/catalogues", "active": true },
         { "label": "Search", "url": "/search", "active": true },
         { "label": "SPARQL", "url": "/sparql", "active": true },
         { "label": "API", "url": "/docs", "active": true },
