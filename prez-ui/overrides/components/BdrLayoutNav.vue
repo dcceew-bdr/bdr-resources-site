@@ -18,7 +18,7 @@ const menuItems: MenuItem[] = (typeof appConfig.menu === 'function' ? appConfig.
 
 <template>
     <div class="relative bg-white">
-        <nav class="main-nav container mx-auto hidden md:flex md:flex-row border-b-2 border-gray-200">
+        <nav class="main-nav container mx-auto hidden md:flex md:flex-row border-gray-200">
             <template v-for="item in menuItems.filter(item => item.active)" :key="item.label">
                 <a
                     v-if="item.url.startsWith('http')"
