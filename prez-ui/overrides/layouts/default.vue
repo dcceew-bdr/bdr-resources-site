@@ -30,7 +30,7 @@ onBeforeMount(() => {
 
         <BdrLayoutNav v-model="showDebugPanel" />
 
-        <div style="height: 30px; background-color: #083A42;"></div>
+        <div style="height: 8px; background-color: #8bdcf8;"></div>
 
         <div class="bg-[#EBF5FB]">
             <div class="container mx-auto">
@@ -76,7 +76,7 @@ onBeforeMount(() => {
         </div>
 
         <!-- content -->
-        <div class="container mx-auto flex-grow">
+        <div class="container mx-auto flex-grow pb-8">
             <div v-if="sidepanel" class="section grid grid-cols-4 gap-4">
                 <div :class="expandSidePanel ? 'col-span-3 relative' : 'col-span-4 relative'">
                     <slot />
