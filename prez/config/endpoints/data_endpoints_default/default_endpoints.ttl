@@ -125,6 +125,6 @@ ex:shape-R0-HL3
                 ]
             ) ;
         ] ;
-    sh:targetClass skos:Concept ;
+    sh:targetClass skos:Concept, skos:Collection ;
     ont:hierarchyLevel 3 ;
 .
