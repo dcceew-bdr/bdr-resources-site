@@ -1,3 +1,4 @@
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX ex: <http://example.org/>
 PREFIX ont: <https://prez.dev/ont/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -50,7 +51,9 @@ ex:items-listing
         ont:ListingEndpoint ;
     rdfs:label "Items Listing" ;
     ont:apiPath "/catalogues/{catalogId}/collections/{recordsCollectionId}/items" ;
-    ont:relevantShapes ex:shape-R0-HL3 ;
+    ont:relevantShapes
+        ex:shape-R0-HL3 ,
+        ex:shape-R0-HL3-1 ;
 .
 
 ex:items-object
@@ -59,7 +62,31 @@ ex:items-object
         ont:ObjectEndpoint ;
     rdfs:label "Items Object" ;
     ont:apiPath "/catalogues/{catalogId}/collections/{recordsCollectionId}/items/{itemId}" ;
-    ont:relevantShapes ex:shape-R0-HL3 ;
+    ont:relevantShapes
+        ex:shape-R0-HL3 ,
+        ex:shape-R0-HL3-1 ;
+.
+
+ex:members-listing
+    a
+        ont:DynamicEndpoint ,
+        ont:ListingEndpoint ;
+    rdfs:label "Members Listing" ;
+    ont:apiPath "/catalogues/{catalogId}/collections/{recordsCollectionId}/items/{itemId}/members" ;
+    ont:relevantShapes
+        ex:shape-R0-HL4 ,
+        ex:shape-R0-HL4-1 ;
+.
+
+ex:members-object
+    a
+        ont:DynamicEndpoint ,
+        ont:ObjectEndpoint ;
+    rdfs:label "Members Object" ;
+    ont:apiPath "/catalogues/{catalogId}/collections/{recordsCollectionId}/items/{itemId}/members/{memberId}" ;
+    ont:relevantShapes
+        ex:shape-R0-HL4 ,
+        ex:shape-R0-HL4-1 ;
 .
 
 ex:shape-R0-HL1
@@ -127,4 +154,110 @@ ex:shape-R0-HL3
         ] ;
     sh:targetClass skos:Concept, skos:Collection ;
     ont:hierarchyLevel 3 ;
+.
+
+ex:shape-R0-HL3-1
+    a sh:NodeShape ;
+    sh:property
+        [
+            sh:class schema:Dataset ;
+            sh:path
+                [
+                    sh:inversePath schema:hasPart ;
+                ] ;
+        ] ,
+        [
+            sh:class schema:DataCatalog ;
+            sh:path (
+                [
+                    sh:inversePath schema:hasPart ;
+                ]
+
+                [
+                    sh:inversePath schema:hasPart ;
+                ]
+            ) ;
+        ] ;
+    sh:targetClass rdfs:Container ;
+    ont:hierarchyLevel 3 ;
+.
+
+ex:shape-R0-HL4
+    a sh:NodeShape ;
+    sh:property
+        [
+            sh:class rdfs:Container ;
+            sh:path
+                [
+                    sh:inversePath rdfs:member ;
+                ] ;
+        ] ,
+        [
+            sh:class schema:Dataset ;
+            sh:path (
+                [
+                    sh:inversePath rdfs:member ;
+                ]
+
+                [
+                    sh:inversePath schema:hasPart ;
+                ]
+            ) ;
+        ] ,
+        [
+            sh:class schema:DataCatalog ;
+            sh:path (
+                [
+                    sh:inversePath rdfs:member ;
+                ]
+
+                [
+                    sh:inversePath schema:hasPart ;
+                ]
+
+                [
+                    sh:inversePath schema:hasPart ;
+                ]
+            ) ;
+        ] ;
+    sh:targetClass dwc:Taxon ;
+    ont:hierarchyLevel 4 ;
+.
+
+ex:shape-R0-HL4-1
+    a sh:NodeShape ;
+    sh:property
+        [
+            sh:class rdfs:Container ;
+            sh:path
+                [
+                    sh:inversePath rdfs:member ;
+                ] ;
+        ] ,
+        [
+            sh:class skos:ConceptScheme ;
+            sh:path (
+                [
+                    sh:inversePath rdfs:member ;
+                ]
+
+                skos:inScheme
+            ) ;
+        ] ,
+        [
+            sh:class schema:DataCatalog ;
+            sh:path (
+                [
+                    sh:inversePath rdfs:member ;
+                ]
+
+                skos:inScheme
+
+                [
+                    sh:inversePath schema:hasPart ;
+                ]
+            ) ;
+        ] ;
+    sh:targetClass dwc:Taxon ;
+    ont:hierarchyLevel 4 ;
 .
