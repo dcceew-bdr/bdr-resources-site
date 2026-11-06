@@ -53,8 +53,7 @@ ex:items-listing
     ont:apiPath "/catalogues/{catalogId}/collections/{recordsCollectionId}/items" ;
     ont:relevantShapes
         ex:shape-R0-HL3 ,
-        ex:shape-R0-HL3-1 ,
-        ex:shape-R0-HL3-2 ;
+        ex:shape-R0-HL3-1 ;
 .
 
 ex:items-object
@@ -65,8 +64,7 @@ ex:items-object
     ont:apiPath "/catalogues/{catalogId}/collections/{recordsCollectionId}/items/{itemId}" ;
     ont:relevantShapes
         ex:shape-R0-HL3 ,
-        ex:shape-R0-HL3-1 ,
-        ex:shape-R0-HL3-2 ;
+        ex:shape-R0-HL3-1 ;
 .
 
 ex:members-listing
@@ -102,10 +100,6 @@ ex:shape-R0-HL1
                 ]
 
                 [
-                    sh:class skos:Collection ;
-                ]
-
-                [
                     sh:class owl:Ontology ;
                 ]
 
@@ -137,8 +131,7 @@ ex:shape-R0-HL2
         owl:Ontology ,
         schema:Dataset ,
         sh:ShapesGraph ,
-        skos:ConceptScheme ,
-        skos:Collection ;
+        skos:ConceptScheme ;
     ont:hierarchyLevel 2 ;
 .
 
@@ -267,24 +260,4 @@ ex:shape-R0-HL4-1
         ] ;
     sh:targetClass dwc:Taxon ;
     ont:hierarchyLevel 4 ;
-.
-
-# Concepts in a SKOS Collection listed directly by a catalogue. Keep the
-# existing inScheme and dataset-container paths as independent alternatives.
-ex:shape-R0-HL3-2
-    a sh:NodeShape ;
-    sh:property
-        [
-            sh:class skos:Collection ;
-            sh:path [ sh:inversePath skos:member ] ;
-        ] ,
-        [
-            sh:class schema:DataCatalog ;
-            sh:path (
-                [ sh:inversePath skos:member ]
-                [ sh:inversePath schema:hasPart ]
-            ) ;
-        ] ;
-    sh:targetClass skos:Concept ;
-    ont:hierarchyLevel 3 ;
 .
