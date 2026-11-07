@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { Objects } from "prez-components";
+import { isVisibleType, RDF_TYPE } from "../utils/visibleTypes";
 
 const props = defineProps({
   predicate: { type: Object, required: true },
@@ -10,8 +11,8 @@ const props = defineProps({
 const term = resolveComponent("Term");
 
 const objects = computed(() =>
-  props.predicate.value === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-    ? props.objects.filter((object) => !object.value.startsWith("https://olis.dev/"))
+  props.predicate.value === RDF_TYPE
+    ? props.objects.filter(isVisibleType)
     : props.objects,
 );
 

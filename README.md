@@ -47,31 +47,7 @@ task stack:up
 This starts Fuseki first and then starts Prez and PrezUI against its `refdata` dataset. Open the catalogue UI at
 <http://localhost:3000/catalogs> or the Fuseki UI at <http://localhost:3030/>.
 
-### Loading the reference data
-
-Check out `resources.bdr.gov.au-data` beside this repository and install
-[kgm](https://kurrawong.github.io/kgm/). With the stack healthy, load its manifest into the local dataset:
-
-```bash
-task data:sync
-task fuseki:restart
-```
-
-The sync task is the local equivalent of that repository's `resources/kgm-sync.sh`: it reads
-`../resources.bdr.gov.au-data/resources/manifest.ttl`, targets `http://localhost:3030/refdata/`, and authenticates as
-`refdata`. You may instead pass another manifest directly to `fuseki/kgm-sync.sh`. Restart Fuseki after a load so its
-on-disk GeoSPARQL index is rebuilt from the newly loaded data; the Lucene full-text index is maintained during updates.
-
-Other stack commands are:
-
-```bash
-task stack:restart
-task stack:logs
-task stack:down
-task stack:clean
-```
-
-`stack:clean` removes the stack-owned `fuseki-data` volume and all locally loaded RDF data.
+NOTE: the `refdata` dataset must be created in Fuseki using a method such as `kgm sync` - see the `resources.bdr.gov.au-data` repository for details.
 
 ### Running with the Azure Functions emulator
 
