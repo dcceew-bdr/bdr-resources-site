@@ -117,7 +117,7 @@ ex:shape-R0-HL1
                     sh:class schema:Dataset ;
                 ]
             ) ;
-            sh:path schema:hasPart ;
+            sh:path rdfs:member ;
         ] ;
     sh:targetClass schema:DataCatalog ;
     ont:hierarchyLevel 1 ;
@@ -130,7 +130,7 @@ ex:shape-R0-HL2
             sh:class schema:DataCatalog ;
             sh:path
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ] ;
         ] ;
     sh:targetClass
@@ -155,7 +155,7 @@ ex:shape-R0-HL3
                 skos:inScheme
 
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
             ) ;
         ] ;
@@ -170,18 +170,18 @@ ex:shape-R0-HL3-1
             sh:class schema:Dataset ;
             sh:path
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ] ;
         ] ,
         [
             sh:class schema:DataCatalog ;
             sh:path (
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
 
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
             ) ;
         ] ;
@@ -207,7 +207,7 @@ ex:shape-R0-HL4
                 ]
 
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
             ) ;
         ] ,
@@ -219,11 +219,11 @@ ex:shape-R0-HL4
                 ]
 
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
 
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
             ) ;
         ] ;
@@ -261,7 +261,7 @@ ex:shape-R0-HL4-1
                 skos:inScheme
 
                 [
-                    sh:inversePath schema:hasPart ;
+                    sh:inversePath rdfs:member ;
                 ]
             ) ;
         ] ;
@@ -282,7 +282,6 @@ ex:shape-R0-HL3-2
             sh:class schema:DataCatalog ;
             sh:path (
                 [ sh:inversePath skos:member ]
-                [ sh:inversePath schema:hasPart ]
             ) ;
         ] ;
     sh:targetClass skos:Concept ;

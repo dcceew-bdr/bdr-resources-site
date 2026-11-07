@@ -118,4 +118,14 @@ prez:OGCSKOSCollectionObjectProfile
     altr-ext:hasResourceFormat "application/ld+json", "application/anot+ld+json", "application/rdf+xml", "text/anot+turtle", "text/turtle" ;
     altr-ext:hasDefaultResourceFormat "text/anot+turtle" ;
     altr-ext:constrainsClass skos:Collection ;
-    sh:property [ sh:path [ sh:union ( [ shext:bNodeDepth "2" ] shext:allPredicateValues ) ] ], [ sh:path skos:member ] .
+    sh:property
+       [
+            sh:path [
+                sh:union (
+                    [ shext:bNodeDepth "2" ]
+                    shext:allPredicateValues
+                )
+            ]
+        ],
+        [ sh:path skos:member ] ;
+    .
