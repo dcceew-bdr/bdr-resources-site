@@ -54,7 +54,8 @@ ex:items-listing
     ont:relevantShapes
         ex:shape-R0-HL3 ,
         ex:shape-R0-HL3-1 ,
-        ex:shape-R0-HL3-2 ;
+        ex:shape-R0-HL3-2 ,
+        ex:shape-R0-HL3-resource ;
 .
 
 ex:items-object
@@ -66,7 +67,8 @@ ex:items-object
     ont:relevantShapes
         ex:shape-R0-HL3 ,
         ex:shape-R0-HL3-1 ,
-        ex:shape-R0-HL3-2 ;
+        ex:shape-R0-HL3-2 ,
+        ex:shape-R0-HL3-resource ;
 .
 
 ex:members-listing
@@ -96,23 +98,23 @@ ex:shape-R0-HL1
     sh:property
         [
             sh:or (
-
+                
                 [
                     sh:class skos:ConceptScheme ;
                 ]
-
+                
                 [
                     sh:class skos:Collection ;
                 ]
-
+                
                 [
                     sh:class owl:Ontology ;
                 ]
-
+                
                 [
                     sh:class sh:ShapesGraph ;
                 ]
-
+                
                 [
                     sh:class schema:Dataset ;
                 ]
@@ -135,37 +137,39 @@ ex:shape-R0-HL2
         ] ;
     sh:targetClass
         owl:Ontology ,
-        schema:Dataset ,
-        sh:ShapesGraph ,
+        skos:Collection ,
         skos:ConceptScheme ,
-        skos:Collection ;
+        sh:ShapesGraph ,
+        schema:Dataset ;
     ont:hierarchyLevel 2 ;
 .
 
 ex:shape-R0-HL3
     a sh:NodeShape ;
-    sh:property
-        [
-            sh:class skos:ConceptScheme ;
-            sh:path skos:inScheme ;
-        ] ,
+    sh:property 
         [
             sh:class schema:DataCatalog ;
             sh:path (
                 skos:inScheme
-
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
             ) ;
+        ] ,
+        [
+            sh:class skos:ConceptScheme ;
+            sh:path skos:inScheme ;
         ] ;
-    sh:targetClass skos:Concept, skos:Collection ;
+    sh:targetClass
+        skos:Collection ,
+        skos:Concept ;
     ont:hierarchyLevel 3 ;
 .
 
 ex:shape-R0-HL3-1
     a sh:NodeShape ;
-    sh:property
+    sh:property 
         [
             sh:class schema:Dataset ;
             sh:path
@@ -176,10 +180,11 @@ ex:shape-R0-HL3-1
         [
             sh:class schema:DataCatalog ;
             sh:path (
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
-
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
@@ -189,9 +194,84 @@ ex:shape-R0-HL3-1
     ont:hierarchyLevel 3 ;
 .
 
+ex:shape-R0-HL3-2
+    a sh:NodeShape ;
+    sh:property 
+        [
+            sh:class skos:Collection ;
+            sh:path
+                [
+                    sh:inversePath skos:member ;
+                ] ;
+        ] ,
+        [
+            sh:class schema:DataCatalog ;
+            sh:path (
+                
+                [
+                    sh:inversePath skos:member ;
+                ]
+            ) ;
+        ] ;
+    sh:targetClass skos:Concept ;
+    ont:hierarchyLevel 3 ;
+.
+
+ex:shape-R0-HL3-resource
+    a sh:NodeShape ;
+    sh:property 
+        [
+            sh:class schema:DataCatalog ;
+            sh:path (
+                
+                [
+                    sh:alternativePath (
+                        
+                        [
+                            sh:inversePath rdfs:member ;
+                        ]
+                        rdfs:isDefinedBy
+                    ) ;
+                ]
+                
+                [
+                    sh:inversePath rdfs:member ;
+                ]
+            ) ;
+        ] ,
+        [
+            sh:or (
+                
+                [
+                    sh:class schema:Dataset ;
+                ]
+                
+                [
+                    sh:class owl:Ontology ;
+                ]
+                
+                [
+                    sh:class sh:ShapesGraph ;
+                ]
+            ) ;
+            sh:path
+                [
+                    sh:alternativePath (
+                        
+                        [
+                            sh:inversePath rdfs:member ;
+                        ]
+                        rdfs:isDefinedBy
+                    ) ;
+                ] ;
+        ] ;
+    sh:targetClass rdfs:Resource ;
+    ont:hierarchyLevel 3 ;
+.
+
 ex:shape-R0-HL4
     a sh:NodeShape ;
-    sh:property
+    sh:property 
         [
             sh:class rdfs:Container ;
             sh:path
@@ -200,28 +280,30 @@ ex:shape-R0-HL4
                 ] ;
         ] ,
         [
-            sh:class schema:Dataset ;
+            sh:class schema:DataCatalog ;
             sh:path (
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
-
+                
+                [
+                    sh:inversePath rdfs:member ;
+                ]
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
             ) ;
         ] ,
         [
-            sh:class schema:DataCatalog ;
+            sh:class schema:Dataset ;
             sh:path (
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
-
-                [
-                    sh:inversePath rdfs:member ;
-                ]
-
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
@@ -233,7 +315,7 @@ ex:shape-R0-HL4
 
 ex:shape-R0-HL4-1
     a sh:NodeShape ;
-    sh:property
+    sh:property 
         [
             sh:class rdfs:Container ;
             sh:path
@@ -244,22 +326,22 @@ ex:shape-R0-HL4-1
         [
             sh:class skos:ConceptScheme ;
             sh:path (
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
-
                 skos:inScheme
             ) ;
         ] ,
         [
             sh:class schema:DataCatalog ;
             sh:path (
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
-
                 skos:inScheme
-
+                
                 [
                     sh:inversePath rdfs:member ;
                 ]
@@ -267,23 +349,4 @@ ex:shape-R0-HL4-1
         ] ;
     sh:targetClass dwc:Taxon ;
     ont:hierarchyLevel 4 ;
-.
-
-# Concepts in a SKOS Collection listed directly by a catalogue. Keep the
-# existing inScheme and dataset-container paths as independent alternatives.
-ex:shape-R0-HL3-2
-    a sh:NodeShape ;
-    sh:property
-        [
-            sh:class skos:Collection ;
-            sh:path [ sh:inversePath skos:member ] ;
-        ] ,
-        [
-            sh:class schema:DataCatalog ;
-            sh:path (
-                [ sh:inversePath skos:member ]
-            ) ;
-        ] ;
-    sh:targetClass skos:Concept ;
-    ont:hierarchyLevel 3 ;
 .

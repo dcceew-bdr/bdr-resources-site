@@ -43,6 +43,7 @@ prez:OGCRecordsProfile
             altr-ext:hasDefaultProfile prez:OGCItemProfile ;
             sh:targetClass
                 rdf:Resource ,
+                rdfs:Resource ,
                 skos:Concept ,
                 dcat:Catalog ,
                 dcat:Resource ,
@@ -53,6 +54,7 @@ prez:OGCRecordsProfile
             altr-ext:hasDefaultProfile prez:OGCListingProfile ;
             sh:targetClass
                 rdf:Resource ,
+                rdfs:Resource ,
                 skos:Collection ,
                 skos:Concept ,
                 dcat:Catalog ,
@@ -79,6 +81,7 @@ prez:OGCItemProfile
     dcterms:title "OGC Object Profile" ;
     altr-ext:constrainsClass
         rdf:Resource ,
+        rdfs:Resource ,
         skos:Collection ,
         skos:Concept ,
         skos:ConceptScheme ,
@@ -114,7 +117,6 @@ prez:OGCItemProfile
                 dcterms:hasPart ,
                 vann:preferredNamespacePrefix ,
                 vann:preferredNamespaceUri ,
-                rdfs:member ,
                 skos:member ,
                 olis:includes ,
                 schema:hasPart ;
@@ -131,6 +133,7 @@ prez:OGCListingProfile
     dcterms:title "OGC Listing Profile" ;
     altr-ext:constrainsClass
         rdf:Resource ,
+        rdfs:Resource ,
         skos:Collection ,
         skos:Concept ,
         dcat:Catalog ,
@@ -153,6 +156,7 @@ prez:OGCListingProfile
                     sh:union (
                         rdf:type
                         schema:keywords
+                        shext:allPredicateValues
                     ) ;
                 ] ;
         ] ;

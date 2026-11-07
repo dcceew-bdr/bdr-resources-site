@@ -21,7 +21,8 @@ const route = useRoute();
             </div>
         </template>
         <template #item-members="{ data, isConceptScheme }">
-            <MembersList v-if="data.data.members && !isConceptScheme" :key="route.path" :membersUrl="data.data.members.value" />
+            <MembersList v-if="data.data.members && !isConceptScheme" :key="route.path" :membersUrl="data.data.members.value"
+                :direct-members="data.data.properties?.['http://www.w3.org/2000/01/rdf-schema#member']?.objects" />
         </template>
     </ItemPage>
     <ListPage v-else />
