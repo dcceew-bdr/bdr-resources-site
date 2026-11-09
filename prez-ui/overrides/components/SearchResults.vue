@@ -1,22 +1,22 @@
 <script lang="ts" setup>
 import { computed, type Component } from "vue";
 import { SearchResults, type SearchResultsProps } from "prez-components";
+import { isVisibleType, RDF_TYPE } from "../utils/visibleTypes";
 
 const props = defineProps<SearchResultsProps>();
-const rdfType = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-const isPublicClass = (node: { value: string }) => !node.value.startsWith("https://olis.dev/");
+const rdfType = RDF_TYPE;
 
 const results = computed(() => props.results.map((result) => ({
   ...result,
   resource: {
     ...result.resource,
-    rdfTypes: result.resource.rdfTypes?.filter(isPublicClass),
+    rdfTypes: result.resource.rdfTypes?.filter(isVisibleType),
     properties: result.resource.properties?.[rdfType]
       ? {
           ...result.resource.properties,
           [rdfType]: {
             ...result.resource.properties[rdfType],
-            objects: result.resource.properties[rdfType].objects.filter(isPublicClass),
+            objects: result.resource.properties[rdfType].objects.filter(isVisibleType),
           },
         }
       : result.resource.properties,

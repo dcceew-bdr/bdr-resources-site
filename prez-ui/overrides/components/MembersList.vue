@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import { literal, node, type PrezFocusNode, type PrezLiteral, type PrezProfile, type PrezTerm } from "prez-lib";
+
 const props = defineProps<{
     membersUrl: string;
+    directMembers?: PrezTerm[];
 }>();
 
 const route = useRoute();
@@ -14,11 +17,67 @@ watch(() => route.fullPath, () => {
     urlPath.value = props.membersUrl + '?' + new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
+        _profile: 'prez:OGCListingProfile',
     }).toString();
 }, { immediate: true });
 
 const { status, error, data } = useGetList(useGetPrezAPIEndpoint(), urlPath);
 const currentProfile = computed(() => data.value ? data.value.profiles.find(p => p.current) : undefined);
+const keywordsIri = 'https://schema.org/keywords';
+const hiddenFields = new Set([
+    keywordsIri,
+    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+    'http://example.com/shacl-extension#allPredicateValues',
+]);
+const memberFields = computed<PrezProfile>(() => {
+    const fields = globalProfiles.value?.[currentProfile.value?.uri || ''] ?? [];
+    // Keep exactly one Keywords column, including when a profile already supplies it.
+    return [
+        ...fields.filter(field => !hiddenFields.has(field.node.value)),
+        { node: node({ value: keywordsIri, label: literal('Keywords') }) },
+    ];
+});
+const labelCollator = new Intl.Collator('en', { sensitivity: 'base', numeric: true });
+const labelPredicates = [
+    'http://www.w3.org/2000/01/rdf-schema#label',
+    'https://schema.org/name',
+    'http://schema.org/name',
+    'http://www.w3.org/2004/02/skos/core#prefLabel',
+];
+const listedMembers = computed(() => {
+    const members = [...(data.value?.data ?? [])];
+    // The API omits members with no outgoing triples. Recover these references
+    // when the entire listing fits on one page, without duplicating paginated results.
+    if (data.value && data.value.count <= pagination.value.limit && pagination.value.page === 1) {
+        const listed = new Set(members.map(member => member.value));
+        for (const member of props.directMembers ?? []) {
+            if (member.termType === 'NamedNode' && !listed.has(member.value)) {
+                members.push(member as PrezFocusNode);
+                listed.add(member.value);
+            }
+        }
+    }
+    return members;
+});
+const sortedMembers = computed(() => listedMembers.value.map(member => {
+    const label = member.label ?? labelPredicates.flatMap(predicate =>
+        member.properties?.[predicate]?.objects ?? []
+    ).find((term): term is PrezLiteral => term.termType === 'Literal' && !!term.value.trim());
+    return {
+        ...member,
+        label,
+        links: member.links?.length ? member.links : [{
+            value: member.curie
+                ? `${props.membersUrl}/${encodeURIComponent(member.curie)}`
+                : `/object?${new URLSearchParams({ uri: member.value })}`,
+            parents: [],
+        }],
+    };
+}).sort((a, b) => {
+    const aLabel = a.label?.value?.trim() || a.curie || a.value;
+    const bLabel = b.label?.value?.trim() || b.curie || b.value;
+    return labelCollator.compare(aLabel, bLabel) || labelCollator.compare(a.value, b.value);
+}));
 </script>
 
 <template>
@@ -27,7 +86,7 @@ const currentProfile = computed(() => data.value ? data.value.profiles.find(p =>
         <Message v-if="error" severity="error">{{ error }}</Message>
         <Loading v-else-if="status == 'pending'" />
         <template v-else-if="data?.data">
-            <ItemList v-if="globalProfiles && currentProfile" :fields="globalProfiles?.[currentProfile?.uri || '']" :list="data.data" :key="urlPath" />
+            <ItemList v-if="globalProfiles && currentProfile" :fields="memberFields" :list="sortedMembers" :key="urlPath" />
             <Loading v-else />
             <PrezPagination :totalItems="data.count" :pagination="pagination" :maxReached="data.maxReached" />
         </template>
