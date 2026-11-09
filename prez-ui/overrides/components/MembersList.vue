@@ -5,7 +5,8 @@ import { isVisibleType, RDF_TYPE } from "../utils/visibleTypes";
 const props = defineProps<{
     membersUrl: string;
     directMembers?: PrezTerm[];
-    ontologyIri?: string;
+    definingResourceIri?: string;
+    isValidator?: boolean;
 }>();
 
 const route = useRoute();
@@ -33,10 +34,10 @@ const hiddenFields = new Set([
     'http://example.com/shacl-extension#allPredicateValues',
 ]);
 const memberFields = computed<PrezProfile>(() => {
-    if (props.ontologyIri) {
+    if (props.definingResourceIri) {
         return [
             { node: node({ value: RDF_TYPE, label: literal('Type') }) },
-            { node: node({ value: definingModelIri, label: literal('Defining Model') }) },
+            { node: node({ value: definingModelIri, label: literal(props.isValidator ? 'Defining Shapes Graph' : 'Defining Model') }) },
         ];
     }
     const fields = globalProfiles.value?.[currentProfile.value?.uri || ''] ?? [];
@@ -88,7 +89,7 @@ const sortedMembers = computed(() => listedMembers.value.map(member => {
     return labelCollator.compare(aLabel, bLabel) || labelCollator.compare(a.value, b.value);
 }));
 const displayedMembers = computed(() => {
-    if (!props.ontologyIri) return sortedMembers.value;
+    if (!props.definingResourceIri) return sortedMembers.value;
     return sortedMembers.value.map(member => {
         const typeLabels: Record<string, string> = {
             'http://www.w3.org/2002/07/owl#Class': 'Class',
@@ -105,7 +106,7 @@ const displayedMembers = computed(() => {
             ) === index)
             .map(type => typeLabels[type.value] ? { ...type, label: literal(typeLabels[type.value]) } : type);
         const definingModels = (member.properties?.[definingModelIri]?.objects ?? [])
-            .map(model => model.value === props.ontologyIri ? literal('here') : model);
+            .map(model => model.value === props.definingResourceIri ? literal('here') : model);
         return {
             ...member,
             properties: {
