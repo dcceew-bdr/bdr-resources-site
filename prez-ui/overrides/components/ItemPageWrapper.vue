@@ -26,6 +26,7 @@ const route = useRoute();
                 <MembersList
                     v-if="data.data.members && !data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2004/02/skos/core#ConceptScheme')"
                     :key="route.path" :membersUrl="data.data.members.value"
+                    :ontology-iri="data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2002/07/owl#Ontology') ? data.data.value : undefined"
                     :direct-members="data.data.properties?.['http://www.w3.org/2000/01/rdf-schema#member']?.objects" />
             </div>
         </template>
