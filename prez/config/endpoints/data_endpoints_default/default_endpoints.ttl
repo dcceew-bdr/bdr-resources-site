@@ -54,7 +54,6 @@ ex:items-listing
     ont:relevantShapes
         ex:shape-R0-HL3 ,
         ex:shape-R0-HL3-1 ,
-        ex:shape-R0-HL3-2 ,
         ex:shape-R0-HL3-resource ;
 .
 
@@ -67,7 +66,6 @@ ex:items-object
     ont:relevantShapes
         ex:shape-R0-HL3 ,
         ex:shape-R0-HL3-1 ,
-        ex:shape-R0-HL3-2 ,
         ex:shape-R0-HL3-resource ;
 .
 
@@ -104,10 +102,6 @@ ex:shape-R0-HL1
                 ]
                 
                 [
-                    sh:class skos:Collection ;
-                ]
-                
-                [
                     sh:class owl:Ontology ;
                 ]
                 
@@ -137,7 +131,6 @@ ex:shape-R0-HL2
         ] ;
     sh:targetClass
         owl:Ontology ,
-        skos:Collection ,
         skos:ConceptScheme ,
         sh:ShapesGraph ,
         schema:Dataset ;
@@ -191,29 +184,6 @@ ex:shape-R0-HL3-1
             ) ;
         ] ;
     sh:targetClass rdfs:Container ;
-    ont:hierarchyLevel 3 ;
-.
-
-ex:shape-R0-HL3-2
-    a sh:NodeShape ;
-    sh:property 
-        [
-            sh:class skos:Collection ;
-            sh:path
-                [
-                    sh:inversePath skos:member ;
-                ] ;
-        ] ,
-        [
-            sh:class schema:DataCatalog ;
-            sh:path (
-                
-                [
-                    sh:inversePath skos:member ;
-                ]
-            ) ;
-        ] ;
-    sh:targetClass skos:Concept ;
     ont:hierarchyLevel 3 ;
 .
 

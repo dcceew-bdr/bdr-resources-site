@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { literal, node, type PrezFocusNode, type PrezLiteral, type PrezProfile, type PrezTerm } from "prez-lib";
+import { isVisibleType, RDF_TYPE } from "../utils/visibleTypes";
 
 const props = defineProps<{
     membersUrl: string;
     directMembers?: PrezTerm[];
+    definingResourceIri?: string;
+    isValidator?: boolean;
 }>();
 
 const route = useRoute();
@@ -24,12 +27,19 @@ watch(() => route.fullPath, () => {
 const { status, error, data } = useGetList(useGetPrezAPIEndpoint(), urlPath);
 const currentProfile = computed(() => data.value ? data.value.profiles.find(p => p.current) : undefined);
 const keywordsIri = 'https://schema.org/keywords';
+const definingModelIri = 'http://www.w3.org/2000/01/rdf-schema#isDefinedBy';
 const hiddenFields = new Set([
     keywordsIri,
     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
     'http://example.com/shacl-extension#allPredicateValues',
 ]);
 const memberFields = computed<PrezProfile>(() => {
+    if (props.definingResourceIri) {
+        return [
+            { node: node({ value: RDF_TYPE, label: literal('Type') }) },
+            { node: node({ value: definingModelIri, label: literal(props.isValidator ? 'Defining Shapes Graph' : 'Defining Model') }) },
+        ];
+    }
     const fields = globalProfiles.value?.[currentProfile.value?.uri || ''] ?? [];
     // Keep exactly one Keywords column, including when a profile already supplies it.
     return [
@@ -78,6 +88,35 @@ const sortedMembers = computed(() => listedMembers.value.map(member => {
     const bLabel = b.label?.value?.trim() || b.curie || b.value;
     return labelCollator.compare(aLabel, bLabel) || labelCollator.compare(a.value, b.value);
 }));
+const displayedMembers = computed(() => {
+    if (!props.definingResourceIri) return sortedMembers.value;
+    return sortedMembers.value.map(member => {
+        const typeLabels: Record<string, string> = {
+            'http://www.w3.org/2002/07/owl#Class': 'Class',
+            'http://www.w3.org/2000/01/rdf-schema#Class': 'Class',
+            'http://www.w3.org/2002/07/owl#ObjectProperty': 'Object Property',
+            'http://www.w3.org/2002/07/owl#DatatypeProperty': 'Datatype Property',
+            'http://www.w3.org/2002/07/owl#AnnotationProperty': 'Annotation Property',
+            'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property': 'Property',
+        };
+        const types = (member.rdfTypes ?? member.properties?.[RDF_TYPE]?.objects ?? [])
+            .filter(isVisibleType)
+            .filter((type, index, all) => all.findIndex(other =>
+                (typeLabels[other.value] ?? other.value) === (typeLabels[type.value] ?? type.value)
+            ) === index)
+            .map(type => typeLabels[type.value] ? { ...type, label: literal(typeLabels[type.value]) } : type);
+        const definingModels = (member.properties?.[definingModelIri]?.objects ?? [])
+            .map(model => model.value === props.definingResourceIri ? literal('here') : model);
+        return {
+            ...member,
+            properties: {
+                ...member.properties,
+                [RDF_TYPE]: { predicate: node(RDF_TYPE), objects: types },
+                [definingModelIri]: { predicate: node(definingModelIri), objects: definingModels },
+            },
+        };
+    });
+});
 </script>
 
 <template>
@@ -86,7 +125,7 @@ const sortedMembers = computed(() => listedMembers.value.map(member => {
         <Message v-if="error" severity="error">{{ error }}</Message>
         <Loading v-else-if="status == 'pending'" />
         <template v-else-if="data?.data">
-            <ItemList v-if="globalProfiles && currentProfile" :fields="memberFields" :list="sortedMembers" :key="urlPath" />
+            <ItemList v-if="globalProfiles && currentProfile" :fields="memberFields" :list="displayedMembers" :key="urlPath" />
             <Loading v-else />
             <PrezPagination :totalItems="data.count" :pagination="pagination" :maxReached="data.maxReached" />
         </template>

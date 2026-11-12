@@ -42,8 +42,10 @@ jobs:
           set -euo pipefail
           server="$(az acr show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --query loginServer --output tsv)"
           image="$server/resources-bdr-prez:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          latest="$server/resources-bdr-prez:latest"
           az acr login --name "$REGISTRY" --resource-group "$REGISTRY_GROUP"
-          docker build --platform linux/amd64 --tag "$image" .
+          docker build --platform linux/amd64 --tag "$image" --tag "$latest" .
           docker push "$image"
+          docker push "$latest"
           digest="$(az acr repository show --name "$REGISTRY" --resource-group "$REGISTRY_GROUP" --image "${image#*/}" --query digest --output tsv)"
           echo "reference="$image"" >> "$GITHUB_OUTPUT"

@@ -2,6 +2,7 @@
 import { isVisibleType } from "../utils/visibleTypes";
 
 const route = useRoute();
+const isValidatorsCatalogue = computed(() => /^\/catalogues\/validators:?(?:\/|$)/.test(decodeURIComponent(route.path)));
 </script>
 
 <template>
@@ -20,9 +21,16 @@ const route = useRoute();
                 </div>
             </div>
         </template>
-        <template #item-members="{ data, isConceptScheme }">
-            <MembersList v-if="data.data.members && !isConceptScheme" :key="route.path" :membersUrl="data.data.members.value"
-                :direct-members="data.data.properties?.['http://www.w3.org/2000/01/rdf-schema#member']?.objects" />
+        <template #item-members="{ data }">
+            <!-- Keep a real slot node when hidden so Vue does not render ItemPage's fallback Members button. -->
+            <div>
+                <MembersList
+                    v-if="data.data.members && !data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2004/02/skos/core#ConceptScheme')"
+                    :key="route.path" :membersUrl="data.data.members.value"
+                    :defining-resource-iri="isValidatorsCatalogue || data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2002/07/owl#Ontology') ? data.data.value : undefined"
+                    :is-validator="isValidatorsCatalogue"
+                    :direct-members="data.data.properties?.['http://www.w3.org/2000/01/rdf-schema#member']?.objects" />
+            </div>
         </template>
     </ItemPage>
     <ListPage v-else />
