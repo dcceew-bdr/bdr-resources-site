@@ -1,0 +1,11 @@
+Source: https://github.com/RDFLib/prez-ui/tree/dc7778029666c7097fc5b44e5f623b7e06c82cc8/packages/prez-components/src
+Version: 4.1.4 (tag v4.1.4)
+License: BSD-3-Clause; see LICENSE.
+The published package inlines all Mermaid diagrams into a single JavaScript
+module. These component sources let Vite split dependencies normally instead.
+Local changes: Literal.vue loads Mermaid on demand; type-only imports are
+marked explicitly for Nuxt's Vue compiler; trailing whitespace is normalized.
+The build plugin resolves
+upstream @/ imports within this directory and uses the published stylesheet.
+Keep the matching dependency version pinned; update these sources and build
+adapters together when upgrading Prez Components.
