@@ -28,7 +28,14 @@ RUN rm -rf /app/app
 
 COPY overrides/ /app/
 
-RUN pnpm install
+# The starter can leave empty UI component directories. shadcn-nuxt expects
+# every directory here to contain an index module, even for unused components.
+RUN find /app/components/ui -mindepth 1 -type d -empty -delete
+
+# shadcn-nuxt generates this helper and provides the @/lib/utils alias.
+RUN rm -f /app/lib/utils.ts
+
+RUN pnpm install --frozen-lockfile
 RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm generate
 
 FROM nginx:alpine

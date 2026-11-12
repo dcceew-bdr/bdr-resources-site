@@ -7,6 +7,11 @@ settings:
 overrides:
   dompurify@<3.2.4: '>=3.2.4'
 
+patchedDependencies:
+  prez-ui@4.1.4:
+    hash: 38f2807eeb784ec1777098b604b2304a8b1d1d545c04de7763ff333a814456c9
+    path: patches/prez-ui@4.1.4.patch
+
 importers:
 
   .:
@@ -18,7 +23,7 @@ importers:
         specifier: ^6.14.0
         version: 6.14.0(magicast@0.3.5)(yaml@2.8.1)
       '@triply/yasgui':
-        specifier: ^4.2.28
+        specifier: 4.2.28
         version: 4.2.28
       '@vueuse/core':
         specifier: ^12.8.2
@@ -29,6 +34,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      events:
+        specifier: 3.3.0
+        version: 3.3.0
       lucide-vue-next:
         specifier: ^0.484.0
         version: 0.484.0(vue@3.5.22(typescript@5.9.3))
@@ -36,7 +44,7 @@ importers:
         specifier: ^3.19.3
         version: 3.19.3(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.22)(db0@0.3.4)(eslint@9.23.0(jiti@2.6.1))(ioredis@5.8.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.52.5)(stylus@0.57.0)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.11(jiti@2.6.1)(stylus@0.57.0)(terser@5.44.0)(yaml@2.8.1))(yaml@2.8.1)
       prez-components:
-        specifier: ^4.1.4
+        specifier: 4.1.4
         version: 4.1.4(tailwindcss@3.4.18(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))
       prez-lib:
         specifier: ^4.1.4
@@ -58,8 +66,8 @@ importers:
         version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       prez-ui:
-        specifier: ^4.1.4
-        version: 4.1.4(@vitest/ui@3.0.9)(eslint@9.23.0(jiti@2.6.1))(magicast@0.3.5)(tailwindcss@3.4.18(yaml@2.8.1))(typescript@5.9.3)(vitest@3.0.9)(yaml@2.8.1)
+        specifier: 4.1.4
+        version: 4.1.4(patch_hash=38f2807eeb784ec1777098b604b2304a8b1d1d545c04de7763ff333a814456c9)(@vitest/ui@3.0.9)(eslint@9.23.0(jiti@2.6.1))(magicast@0.3.5)(tailwindcss@3.4.18(yaml@2.8.1))(typescript@5.9.3)(vitest@3.0.9)(yaml@2.8.1)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1740,8 +1748,8 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  baseline-browser-mapping@2.8.18:
-    resolution: {integrity: sha512-UYmTpOBwgPScZpS4A+YbapwWuBwasxvO/2IOHArSsAhL/+ZdmATBXTex3t+l2hXwLVYK382ibr/nKoY9GKe86w==}
+  baseline-browser-mapping@2.11.36:
+    resolution: {integrity: sha512-AbPFGS4K9S3meMRCLTM0Zas+e9X7b5ygUBOboDT5zevCZt9ByKSbMtKhwyVqW+oL8WemPVsbP7X3rdZcIyOa0w==}
     hasBin: true
 
   binary-extensions@2.3.0:
@@ -1832,8 +1840,8 @@ packages:
   caniuse-api@3.0.0:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
 
-  caniuse-lite@1.0.30001751:
-    resolution: {integrity: sha512-A0QJhug0Ly64Ii3eIqHu5X51ebln3k4yTUkY1j8drqpWHVreg/VLijN48cZ1bYPiqOQuqpkIKnzr/Ul8V+p6Cw==}
+  caniuse-lite@1.0.30001826:
+    resolution: {integrity: sha512-wTB+9tIbLro/BCXwLuNV1meHE4L9dS6dArMDwgYfNBPMYScqClHyGunhkCSDtHhe/69Xl0sHlKgBVZ+fNsYtWA==}
 
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
@@ -7043,7 +7051,7 @@ snapshots:
   autoprefixer@10.4.21(postcss@8.5.6):
     dependencies:
       browserslist: 4.26.3
-      caniuse-lite: 1.0.30001751
+      caniuse-lite: 1.0.30001826
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
@@ -7067,7 +7075,7 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  baseline-browser-mapping@2.8.18: {}
+  baseline-browser-mapping@2.11.36: {}
 
   binary-extensions@2.3.0: {}
 
@@ -7096,8 +7104,8 @@ snapshots:
 
   browserslist@4.26.3:
     dependencies:
-      baseline-browser-mapping: 2.8.18
-      caniuse-lite: 1.0.30001751
+      baseline-browser-mapping: 2.11.36
+      caniuse-lite: 1.0.30001826
       electron-to-chromium: 1.5.237
       node-releases: 2.0.25
       update-browserslist-db: 1.1.3(browserslist@4.26.3)
@@ -7173,11 +7181,11 @@ snapshots:
   caniuse-api@3.0.0:
     dependencies:
       browserslist: 4.26.3
-      caniuse-lite: 1.0.30001751
+      caniuse-lite: 1.0.30001826
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
 
-  caniuse-lite@1.0.30001751: {}
+  caniuse-lite@1.0.30001826: {}
 
   chai@5.3.3:
     dependencies:
@@ -9707,7 +9715,7 @@ snapshots:
     dependencies:
       n3: 1.26.0
 
-  prez-ui@4.1.4(@vitest/ui@3.0.9)(eslint@9.23.0(jiti@2.6.1))(magicast@0.3.5)(tailwindcss@3.4.18(yaml@2.8.1))(typescript@5.9.3)(vitest@3.0.9)(yaml@2.8.1):
+  prez-ui@4.1.4(patch_hash=38f2807eeb784ec1777098b604b2304a8b1d1d545c04de7763ff333a814456c9)(@vitest/ui@3.0.9)(eslint@9.23.0(jiti@2.6.1))(magicast@0.3.5)(tailwindcss@3.4.18(yaml@2.8.1))(typescript@5.9.3)(vitest@3.0.9)(yaml@2.8.1):
     dependencies:
       '@nuxtjs/color-mode': 3.5.2(magicast@0.3.5)
       '@nuxtjs/tailwindcss': 6.14.0(magicast@0.3.5)(yaml@2.8.1)

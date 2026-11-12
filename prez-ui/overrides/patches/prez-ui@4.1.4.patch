@@ -1,0 +1,27 @@
+diff --git a/nuxt.config.ts b/nuxt.config.ts
+--- a/nuxt.config.ts
++++ b/nuxt.config.ts
+@@ -17,10 +17,8 @@ export default defineNuxtConfig({
+     ],
+     ssr: false,
+     runtimeConfig: {
+-        app: {
+-            version: pkg.version,
+-        },
+         public: {
++            prezUiVersion: pkg.version,
+             prezApiEndpoint: "http://localhost:8000",
+             prezApiEndpointAlt: "",
+             prezApiEndpointAltNames: "",
+diff --git a/components/LayoutFooter.vue b/components/LayoutFooter.vue
+--- a/components/LayoutFooter.vue
++++ b/components/LayoutFooter.vue
+@@ -10,7 +10,7 @@ const altEndpoints = useGetPrezAPIAltEndpoints();
+         <div class="container mx-auto text-center">
+             <div class="text-sm">
+                 <div>
+-                    Prez UI v{{ runtimeConfig.app.version }} - <a href="https://github.com/RDFLib/prez-ui" target="_blank" rel="noopener noreferrer">GitHub</a>
++                    Prez UI v{{ runtimeConfig.public.prezUiVersion }} - <a href="https://github.com/RDFLib/prez-ui" target="_blank" rel="noopener noreferrer">GitHub</a>
+                 </div>
+                 <div v-if="globalConfig?.version">
+                     Prez API v{{ globalConfig?.version }} - <a href="https://github.com/RDFLib/prez" target="_blank" rel="noopener noreferrer">GitHub</a>
