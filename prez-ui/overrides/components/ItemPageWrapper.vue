@@ -3,6 +3,13 @@ import { isVisibleType } from "../utils/visibleTypes";
 
 const route = useRoute();
 const isValidatorsCatalogue = computed(() => /^\/catalogues\/validators:?(?:\/|$)/.test(decodeURIComponent(route.path)));
+
+function isValidatorObject(term: { rdfTypes?: { value: string }[] }): boolean {
+    return isValidatorsCatalogue.value && !!term.rdfTypes?.some(type =>
+        type.value === 'http://www.w3.org/ns/shacl#ShapesGraph'
+        || type.value === 'http://www.w3.org/2002/07/owl#Ontology'
+    );
+}
 </script>
 
 <template>
@@ -27,8 +34,8 @@ const isValidatorsCatalogue = computed(() => /^\/catalogues\/validators:?(?:\/|$
                 <MembersList
                     v-if="data.data.members && !data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2004/02/skos/core#ConceptScheme')"
                     :key="route.path" :membersUrl="data.data.members.value"
-                    :defining-resource-iri="isValidatorsCatalogue || data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2002/07/owl#Ontology') ? data.data.value : undefined"
-                    :is-validator="isValidatorsCatalogue"
+                    :defining-resource-iri="isValidatorObject(data.data) || data.data.rdfTypes?.some(type => type.value === 'http://www.w3.org/2002/07/owl#Ontology') ? data.data.value : undefined"
+                    :is-validator="isValidatorObject(data.data)"
                     :direct-members="data.data.properties?.['http://www.w3.org/2000/01/rdf-schema#member']?.objects" />
             </div>
         </template>

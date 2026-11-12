@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prez API Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+</head>
+<body>
+    <div id="swagger-ui" role="main">Loading API documentation…</div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+        async function renderDocs() {
+            const endpoint = new URLSearchParams(window.location.search).get('endpoint');
+            if (!endpoint) throw new Error('No API endpoint configured.');
+            const apiUrl = new URL(endpoint, window.location.origin);
+            if (!['http:', 'https:'].includes(apiUrl.protocol)) {
+                throw new Error('The API endpoint must use HTTP or HTTPS.');
+            }
+            const apiBase = apiUrl.href.replace(/\/$/, '');
+            const response = await fetch(apiBase + '/openapi.json');
+            if (!response.ok) throw new Error('OpenAPI request failed: HTTP ' + response.status);
+            const spec = await response.json();
+            // The browser-facing API may be behind /api even when Prez runs at /.
+            spec.servers = [{ url: apiBase }];
+            SwaggerUIBundle({
+                spec,
+                dom_id: '#swagger-ui',
+                layout: 'BaseLayout',
+                deepLinking: true,
+                showExtensions: true,
+                showCommonExtensions: true,
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
+            });
+        }
+        renderDocs().catch((error) => {
+            document.getElementById('swagger-ui').textContent = 'Unable to load API documentation: ' + error.message;
+        });
+    </script>
+</body>
+</html>
