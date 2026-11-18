@@ -40,7 +40,7 @@ services:
       CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:3000}
       # Prez uses this hierarchy when generating internal links for listings.
       # Keep it aligned with prez/config/endpoints/data_endpoints_default.
-      ENDPOINT_STRUCTURE: '["catalogues", "collections", "items"]'
+      ENDPOINT_STRUCTURE: '["catalogues", "collections", "items", "members"]'
     ports:
       - "8000:8000"
     depends_on:

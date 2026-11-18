@@ -13,7 +13,8 @@ export default defineAppConfig({
     ],
 
     nameSubstitutions: {
-        'catalogues': 'Catalogues'
+        'catalogues': 'Catalogues',
+        'members': 'Members'
     },
 
     pagination: {
