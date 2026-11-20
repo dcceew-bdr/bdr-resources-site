@@ -2,7 +2,7 @@ name: Deploy PrezUI Static Web App
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths:
       - "prez-ui/**"
       - ".github/workflows/deploy-prez-ui.yml"
@@ -12,13 +12,15 @@ permissions:
   contents: read
 
 concurrency:
-  group: deploy-prez-ui-dev
+  group: deploy-prez-ui-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   deploy:
+    # main deploys to prod, dev deploys to dev; manual runs from any other branch are skipped.
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
 
     steps:
       - name: Check out source
@@ -50,5 +52,5 @@ jobs:
           output_location: ""
           skip_app_build: true
           skip_api_build: true
-          production_branch: main
+          production_branch: ${{ github.ref_name }}
 
