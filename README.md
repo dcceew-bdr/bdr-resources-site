@@ -106,7 +106,16 @@ The development deployment uses two independent Azure application resources:
 Fuseki runs separately on the VM managed by [`bdr-main-terraform`](https://dev.azure.com/bdr-devops-org/bdr-project/_git/bdr-main-terraform).
 
 The workflows under `.github/workflows/` deploy both applications when relevant
-files change on `main`. Apply `resources.bdr.gov.au-infra` before enabling them.
+files change. The branch selects the GitHub Actions environment:
+
+| Branch | GitHub environment |
+|--------|--------------------|
+| `dev`  | `dev`              |
+| `main` | `prod`             |
+
+Work is merged into `dev` first; `main` is only updated by pull requests from `dev`.
+Both workflows can also be run manually (`workflow_dispatch`) from `dev` or `main`.
+Apply `resources.bdr.gov.au-infra` before enabling them.
 
 ### Container App
 
@@ -119,7 +128,7 @@ The deployment workflow uses the existing GitHub OIDC identity. Terraform grants
 
 Once the images is pushed to the Conntainer Registry, image name neeeds to be updated in Terrafrom
 
-Configure these GitHub Actions `dev` environment variables:
+Configure these variables in both the `dev` and `prod` GitHub Actions environments (example values are for `dev`):
 
 ```text
 AZURE_CLIENT_ID
@@ -143,14 +152,14 @@ for Azure deployment; the Functions emulator remains available for local develop
 ### Static Web App
 
 The Static Web App is managed by `resources.bdr.gov.au-infra`. Store its
-sensitive Terraform deployment-token output as this GitHub Actions repository
-or `dev` environment secret:
+sensitive Terraform deployment-token output as a secret in each GitHub Actions
+environment (`dev` and `prod`), not as a repository secret:
 
 ```text
 AZURE_STATIC_WEB_APPS_API_TOKEN=<deployment token>
 ```
 
-Set `PREZ_API_ENDPOINT` in the GitHub Actions `dev` environment to the `prez_api_endpoint` Terraform output, without
+Set `PREZ_API_ENDPOINT` in each GitHub Actions environment to the `prez_api_endpoint` Terraform output, without
 an `/api` suffix. Rebuild and deploy PrezUI whenever that hostname changes.
 
 The workflow in `.github/workflows/deploy-prez-ui.yml` builds the existing

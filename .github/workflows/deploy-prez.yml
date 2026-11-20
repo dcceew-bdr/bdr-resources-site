@@ -2,7 +2,7 @@ name: Deploy Prez Container App
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths:
       - "Dockerfile"
       - "prez/**"
@@ -14,13 +14,15 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deploy-prez-dev
+  group: deploy-prez-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   deploy:
+    # main deploys to prod, dev deploys to dev; manual runs from any other branch are skipped.
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
 
     steps:
       - name: Check out source
